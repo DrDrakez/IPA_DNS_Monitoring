@@ -1,0 +1,15 @@
+sudo nano /etc/systemd/system/dns-probe.service
+
+[Unit]
+Description=DNS Probe Script
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/dnsuser/dns-probe/dns_probe_script.py
+WorkingDirectory=/home/dnsuser/dns-probe
+User=dnsuser
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
