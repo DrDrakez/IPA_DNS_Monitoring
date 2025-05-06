@@ -8,7 +8,7 @@ After=network.target
 Type=simple
 User=dnsuser
 WorkingDirectory=/home/dnsuser/dns-probe
-ExecStart=/home/dnsuser/dns-probe/venv/bin/python /home/dnsuser/dns-probe/dns_probe_script.py
+ExecStart=/home/dnsuser/dns-probe-env/bin/python3 /home/dnsuser/dns-probe/dns_probe_script.py
 Restart=always
 RestartSec=10
 
