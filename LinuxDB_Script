@@ -1,0 +1,41 @@
+#!/bin/bash
+
+echo "[+] Architektur prüfen..."
+ARCH=$(uname -m)
+if [[ "$ARCH" == "aarch64" ]]; then
+ARCH_URL="arm64"
+elif [[ "$ARCH" == "armv7l" ]]; then
+ARCH_URL="armhf"
+else
+echo "[-] Nicht unterstützte Architektur: $ARCH"
+exit 1
+fi
+
+echo "[+] Vorherige InfluxDB-Versionen entfernen..."
+sudo systemctl stop influxdb 2>/dev/null
+sudo apt purge --autoremove influxdb influxdb-client influxdb2 -y
+sudo rm -rf /etc/influxdb /var/lib/influxdb /usr/lib/influxdb /usr/local/bin/influx*
+
+echo "[+] InfluxDB 1.8.10 für $ARCH_URL herunterladen..."
+wget -q https://dl.influxdata.com/influxdb/releases/influxdb_1.8.10_${ARCH_URL}.deb
+
+echo "[+] InfluxDB installieren..."
+sudo dpkg -i influxdb_1.8.10_${ARCH_URL}.deb
+
+echo "[+] InfluxDB-Dienst starten..."
+sudo systemctl enable influxdb
+sudo systemctl start influxdb
+
+sleep 2
+
+echo "[+] Dienststatus:"
+sudo systemctl status influxdb --no-pager
+
+echo ""
+echo "[✓] Test: Influx Shell starten..."
+influx -execute "show databases"
+
+
+
+sudo mkdir -p /etc/influxdb
+sudo wget https://raw.githubusercontent.com/influxdata/influxdb/1.8/etc/config.sample.toml -O /etc/influxdb/influxdb.conf
